@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class Booking {
-    Long id;
+    long id;
     LocalDate start;
     LocalDate end;
     Item item;
