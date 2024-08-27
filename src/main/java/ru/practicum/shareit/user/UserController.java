@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) {
         log.info("Поступил PATCH-запрос на обновление пользователя с id = {}", userId);
         return userService.updateUser(userId, userDto);
     }
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable long userId) {
+    public UserDto getUserById(@PathVariable Long userId) {
         log.info("Поступил GET-запрос на получение пользователя c ID = {}", userId);
         return userService.getUserById(userId);
     }

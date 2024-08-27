@@ -4,14 +4,18 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
-    long id;
+    Long id;
     @NotBlank
-    @Size(max = 100, message = "Имя не должно быть больше 100 символов")
+    @Size(max = 255, message = "Имя не должно быть больше 255 символов")
     String name;
     @NotBlank
     @Email
