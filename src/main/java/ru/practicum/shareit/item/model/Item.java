@@ -35,6 +35,7 @@ public class Item {
     @OneToMany
     @JoinColumn(name = "item_id")
     private List<Comment> comments;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
