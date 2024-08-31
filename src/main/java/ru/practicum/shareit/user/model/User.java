@@ -6,11 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
-@Entity
 @Builder
-@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
