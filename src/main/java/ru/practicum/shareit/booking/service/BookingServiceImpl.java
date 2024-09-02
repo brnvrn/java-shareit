@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.exception.IllegalArgumentException;
 import ru.practicum.shareit.user.exception.NotFoundException;
 import ru.practicum.shareit.user.exception.UnavailableItemException;
 import ru.practicum.shareit.user.model.User;
@@ -33,6 +34,10 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime startBooking = bookingRequestDto.getStart();
         LocalDateTime endBooking = bookingRequestDto.getEnd();
 
+        if (startBooking == null || endBooking == null) {
+            throw new IllegalArgumentException("Время начала и окончания бронирования не может быть null");
+        }
+
         if (endBooking.isBefore(startBooking) || endBooking.equals(startBooking)
                 || startBooking.isBefore(LocalDateTime.now())) {
             throw new UnavailableItemException("Время бронирования некорректно");
@@ -41,12 +46,12 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingRequestDto.getItemId()).orElseThrow(() ->
                 new NotFoundException("Вещь не найдена"));
 
-        if (!item.getAvailable()) {
-            throw new IllegalArgumentException("Вещь недоступена для бронирования");
-        }
-
         if (item.getOwner().getId().equals(userId)) {
             throw new UnavailableItemException("Владелец предмета не может забронировать его");
+        }
+
+        if (Boolean.FALSE.equals(item.getAvailable())) {
+            throw new IllegalArgumentException("Item is not available");
         }
 
         User booker = userRepository.findById(userId).orElseThrow(() ->

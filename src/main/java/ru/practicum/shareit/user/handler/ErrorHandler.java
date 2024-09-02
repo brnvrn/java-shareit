@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.user.exception.IllegalArgumentException;
 import ru.practicum.shareit.user.exception.NotFoundException;
 import ru.practicum.shareit.user.exception.NotUniqueEmailException;
 import ru.practicum.shareit.user.exception.UnavailableItemException;
@@ -21,6 +22,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleUnavailableItem(final UnavailableItemException e) {
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleGenericException(final IllegalArgumentException e) {
+        return new ErrorResponse("Произошла ошибка сервера: " + e.getMessage());
     }
 
     @ExceptionHandler
