@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (Boolean.FALSE.equals(item.getAvailable())) {
-            throw new IllegalArgumentException("Item is not available");
+            throw new IllegalArgumentException("Вещь недоступна для бронирования");
         }
 
         User booker = userRepository.findById(userId).orElseThrow(() ->

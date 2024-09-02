@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.dto.ItemCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.exception.IllegalArgumentException;
 import ru.practicum.shareit.user.exception.NotFoundException;
 import ru.practicum.shareit.user.exception.UnavailableItemException;
 import ru.practicum.shareit.user.model.User;
@@ -31,6 +32,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final ItemMapper itemMapper;
+
 
     @Override
     public ItemDto addNewItem(long userId, ItemDto itemDto) {
