@@ -26,6 +26,6 @@ public class User {
     @Column(name = "email")
     @NotBlank
     @Email
-    @Size(max = 30, message = "Эмейл не должен быть больше 30 символов")
+    @Size(max = 50, message = "Эмейл не должен быть больше 50 символов")
     String email;
 }
