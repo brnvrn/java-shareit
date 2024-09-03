@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -20,43 +21,43 @@ public class ItemController {
     public static final String USER_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto addNewItem(@RequestHeader(USER_HEADER) Long userId,
+    public ItemDto addNewItem(@RequestHeader(USER_HEADER) @Positive Long userId,
                               @RequestBody @Valid ItemDto itemDto) {
         log.info("Поступил POST-запрос на добавление предмета");
         return itemService.addNewItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestHeader(USER_HEADER) Long userId,
-                          @PathVariable Long itemId,
+    public ItemDto update(@RequestHeader(USER_HEADER) @Positive Long userId,
+                          @PathVariable @Positive Long itemId,
                           @RequestBody ItemDto itemDto) {
         log.info("Поступил PATCH-запрос на обновление предмета от пользователя с id = {}", itemId);
         return itemService.update(userId, itemId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ItemCommentDto getItemById(@RequestHeader(USER_HEADER) Long userId,
-                                      @PathVariable Long itemId) {
+    public ItemCommentDto getItemById(@RequestHeader(USER_HEADER) @Positive Long userId,
+                                      @PathVariable @Positive Long itemId) {
         log.info("Поступил GET-запрос на получение предмета с id = {} от пользователя c id = {}", itemId, userId);
         return itemService.getItemById(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getAll(@RequestHeader(USER_HEADER) Long userId) {
+    public List<ItemDto> getAll(@RequestHeader(USER_HEADER) @Positive Long userId) {
         log.info("Поступил GET-запрос на получение всех предметов пользователя c id = {}", userId);
         return itemService.findAll(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader(USER_HEADER) Long userId,
+    public List<ItemDto> searchItems(@RequestHeader(USER_HEADER) @Positive Long userId,
                                      @RequestParam(required = false) String text) {
         log.info("Поступил GET-запрос на поиск предмета от пользователя c id = {}", userId);
         return itemService.searchItems(userId, text);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@RequestHeader(USER_HEADER) Long userId,
-                                 @PathVariable Long itemId,
+    public CommentDto addComment(@RequestHeader(USER_HEADER) @Positive Long userId,
+                                 @PathVariable @Positive Long itemId,
                                  @RequestBody @Valid CommentDto commentDto) {
         log.info("Post-запрос addComment");
         return itemService.addComment(userId, itemId, commentDto);
