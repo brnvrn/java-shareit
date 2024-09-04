@@ -3,22 +3,27 @@ package ru.practicum.shareit.item.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
+import lombok.*;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.user.model.User;
 
-@Data
+import java.util.List;
+
+@Getter
+@Setter
+@Builder
+@ToString
 @AllArgsConstructor
 public class ItemDto {
-    long id;
+    private Long id;
     @NotBlank
-    @Size(max = 100, message = "Имя не должно быть больше 100 символов")
-    String name;
+    @Size(max = 255, message = "Имя не должно быть больше 255 символов")
+    private String name;
     @NotBlank(message = "Описание не должно быть пустым")
-    @Size(max = 200, message = "Имя не должно быть больше 200 символов")
-    String description;
+    @Size(max = 255, message = "Имя не должно быть больше 255 символов")
+    private String description;
     @NotNull
-    Boolean available;
-    Long owner;
-    ItemRequest request;
+    private Boolean available;
+    private User owner;
+    private List<Comment> comments;
 }

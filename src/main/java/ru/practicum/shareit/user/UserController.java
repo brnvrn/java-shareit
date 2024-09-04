@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
-        log.info("Поступил PATCH-запрос на обновление пользователя с id = {}", userId);
+    public UserDto updateUser(@PathVariable @Positive Long userId, @RequestBody UserDto userDto) {
+        log.info("PATCH-запрос на обновление пользователя с id = {}", userId);
         return userService.updateUser(userId, userDto);
     }
 
@@ -35,13 +36,13 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable long userId) {
+    public UserDto getUserById(@PathVariable @Positive Long userId) {
         log.info("Поступил GET-запрос на получение пользователя c ID = {}", userId);
         return userService.getUserById(userId);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUserById(@PathVariable Long id) {
+    public void deleteUserById(@PathVariable @Positive Long id) {
         log.info("Поступил DELETE-запрос на удаление пользователя с id = {}", id);
         userService.deleteUserById(id);
     }
