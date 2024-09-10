@@ -27,8 +27,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     private User user;
     private UserDto userDto;
-    
-    private final UserMapper userMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @BeforeEach
     void setUp() {
