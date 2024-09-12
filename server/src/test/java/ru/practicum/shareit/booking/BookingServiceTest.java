@@ -16,6 +16,8 @@ import ru.practicum.shareit.booking.service.BookingMapper;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.exception.NotFoundException;
+import ru.practicum.shareit.user.exception.UnavailableItemException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -24,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -186,5 +187,95 @@ class BookingServiceTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void testAddNewBooking_NullStartAndEndTime() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setItemId(1L);
+
+        assertThrows(IllegalArgumentException.class, () -> bookingService.addNewBooking(2L, bookingRequestDto));
+    }
+
+    @Test
+    void testAddNewBooking_EndTimeBeforeStartTime() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setStart(LocalDateTime.now().plusDays(2));
+        bookingRequestDto.setEnd(LocalDateTime.now().plusDays(1));
+
+        assertThrows(UnavailableItemException.class, () -> bookingService.addNewBooking(2L, bookingRequestDto));
+    }
+
+    @Test
+    void testAddNewBooking_StartTimeInPast() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setStart(LocalDateTime.now().minusDays(1));
+        bookingRequestDto.setEnd(LocalDateTime.now().plusDays(1));
+
+        assertThrows(UnavailableItemException.class, () -> bookingService.addNewBooking(2L, bookingRequestDto));
+    }
+
+    @Test
+    void testAddNewBooking_OwnerCannotBookOwnItem() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setStart(LocalDateTime.now().plusDays(1));
+        bookingRequestDto.setEnd(LocalDateTime.now().plusDays(2));
+
+        User owner = new User();
+        owner.setId(2L);
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwner(owner);
+        item.setAvailable(true);
+
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(owner));
+
+        assertThrows(UnavailableItemException.class, () -> bookingService.addNewBooking(2L, bookingRequestDto));
+    }
+
+    @Test
+    void testApprovedOrRejectBooking_BookingNotFound() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> bookingService.approvedOrRejectBooking(1L, 1L, true));
+    }
+
+    @Test
+    void testApprovedOrRejectBooking_ItemNotFound() {
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setItem(new Item());
+
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> bookingService.approvedOrRejectBooking(1L, 1L, true));
+    }
+
+    @Test
+    void testGetBookingById_BookingNotFound() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingById(1L, 1L));
+    }
+
+    @Test
+    void testGetBookingById_UserNotAllowedToViewBooking() {
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setBooker(new User());
+        booking.getBooker().setId(1L);
+        booking.setItem(new Item());
+        booking.getItem().setOwner(new User());
+        booking.getItem().getOwner().setId(2L);
+
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingById(3L, 1L));
     }
 }

@@ -1,4 +1,5 @@
 package ru.practicum.shareit.item;
+
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -140,5 +143,54 @@ class ItemServiceTest {
         assertEquals(commentDto.getText(), createdComment.getText());
         assertEquals(savedItem.getId(), createdComment.getItemId());
         assertEquals(savedUser.getName(), createdComment.getAuthorName());
+    }
+
+    @Test
+    void testAddNewItem_UserNotFound() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Вещь");
+        itemDto.setDescription("Описание");
+        itemDto.setAvailable(true);
+
+        assertThrows(NotFoundException.class, () -> itemService.addNewItem(999L, itemDto));
+    }
+
+    @Test
+    void testUpdate_ItemNotFound() {
+        ItemDto updateDto = new ItemDto();
+        updateDto.setName("Вещь");
+        updateDto.setDescription("Описание");
+        updateDto.setAvailable(true);
+
+        assertThrows(NotFoundException.class, () -> itemService.update(savedUser.getId(), 999L, updateDto));
+    }
+
+    @Test
+    void testGetItemById_ItemNotFound() {
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(savedUser.getId(), 999L));
+    }
+
+    @Test
+    void testAddComment_ItemNotFound() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("Okey");
+
+        assertThrows(NotFoundException.class, () -> itemService.addComment(savedUser.getId(), 999L, commentDto));
+    }
+
+    @Test
+    void testAddComment_UserNotFound() {
+        Booking booking = new Booking();
+        booking.setItem(savedItem);
+        booking.setBooker(savedUser);
+        booking.setStart(LocalDateTime.now().minusDays(2));
+        booking.setEnd(LocalDateTime.now().minusDays(1));
+        booking.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(booking);
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("Okey");
+
+        assertThrows(NotFoundException.class, () -> itemService.addComment(999L, savedItem.getId(), commentDto));
     }
 }

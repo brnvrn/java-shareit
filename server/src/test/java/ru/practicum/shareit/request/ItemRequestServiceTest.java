@@ -16,6 +16,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestMapper;
 import ru.practicum.shareit.request.service.ItemRequestService;
+import ru.practicum.shareit.user.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -24,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -143,5 +143,46 @@ class ItemRequestServiceTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void testAddNewItemRequest_UserNotFound() {
+        ItemRequestNewDto itemRequestNewDto = new ItemRequestNewDto();
+        itemRequestNewDto.setDescription("Test request");
+
+        assertThrows(NotFoundException.class, () -> itemRequestService.addNewItemRequest(999L, itemRequestNewDto));
+    }
+
+    @Test
+    void testGetItemRequestByUser_UserNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemRequestService.getItemRequestByUser(1L));
+    }
+
+    @Test
+    void testGetItemRequest_ItemNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        when(itemRequestRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemRequestService.getItemRequest(1L, 1L));
+    }
+
+    @Test
+    void testGetAllItemRequests_UserNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemRequestService.getAllItemRequests(1L, 0, 10));
+    }
+
+    @Test
+    void testGetItemRequestByUser_NoRequestsFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        when(itemRequestRepository.findByRequestorIdOrderByCreatedDesc(1L)).thenReturn(new ArrayList<>());
+
+        List<ItemRequestResponseDto> result = itemRequestService.getItemRequestByUser(1L);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }

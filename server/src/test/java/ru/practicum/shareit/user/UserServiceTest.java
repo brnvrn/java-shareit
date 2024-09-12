@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserMapper;
@@ -85,6 +86,22 @@ class UserServiceTest {
         Assertions.assertEquals(result.getId(), userDto.getId());
         Assertions.assertEquals(result.getName(), userDto.getName());
         Assertions.assertEquals(result.getEmail(), userDto.getEmail());
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void testGetUserById_NotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NotFoundException.class, () -> userService.getUserById(999L));
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void testUpdateUser_NotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NotFoundException.class, () -> userService.updateUser(999L, userDto));
         verify(userRepository, times(1)).findById(anyLong());
     }
 }
