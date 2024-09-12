@@ -69,6 +69,13 @@ class BookingRepositoryTest {
             .end(LocalDateTime.now().plusDays(2L))
             .build();
 
+    private final Booking currentBooking = Booking.builder()
+            .item(item)
+            .booker(booker)
+            .status(BookingStatus.APPROVED)
+            .start(LocalDateTime.now().minusHours(1L))
+            .end(LocalDateTime.now().plusDays(1L))
+            .build();
 
     @BeforeEach
     public void init() {
@@ -123,5 +130,27 @@ class BookingRepositoryTest {
                 .findAllByBookerIdAndStatusOrderByStartDesc(booker.getId(), BookingStatus.APPROVED);
         assertEquals(bookings.size(), 3);
         assertEquals(bookings.getFirst().getItem().getOwner().getId(), 2L);
+    }
+
+
+    @Test
+    void findByBooker_IdAndStartIsAfterOrderByStartDesc() {
+        List<Booking> bookings = bookingRepository.findByBooker_IdAndStartIsAfterOrderByStartDesc(booker.getId(), LocalDateTime.now());
+        assertEquals(1, bookings.size());
+        assertEquals(futureBooking, bookings.get(0));
+    }
+
+    @Test
+    void findByBooker_IdAndEndIsBeforeOrderByStartDesc() {
+        List<Booking> bookings = bookingRepository.findByBooker_IdAndEndIsBeforeOrderByStartDesc(booker.getId(), LocalDateTime.now());
+        assertEquals(1, bookings.size());
+        assertEquals(pastBooking, bookings.get(0));
+    }
+
+    @Test
+    void findAllByBookerIdAndItemIdAndStatusAndEndBefore() {
+        List<Booking> bookings = bookingRepository.findAllByBookerIdAndItemIdAndStatusAndEndBefore(booker.getId(), item.getId(), BookingStatus.APPROVED, LocalDateTime.now());
+        assertEquals(1, bookings.size());
+        assertEquals(pastBooking, bookings.get(0));
     }
 }
